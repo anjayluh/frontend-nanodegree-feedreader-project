@@ -27,7 +27,7 @@ $(function() {
         });
 
 
-        /* TODO: Write a test that loops through each feed
+        /* Test that loops through each feed
          * in the allFeeds object and ensures it has a URL defined
          * and that the URL is not empty.
          */
@@ -38,22 +38,22 @@ $(function() {
             }
         });
 
-        /* TODO: Write a test that loops through each feed
+        /* Test that loops through each feed
          * in the allFeeds object and ensures it has a name defined
          * and that the name is not empty.
          */
         it('Check that name exists and is not empty', function() {
             for (let feed of allFeeds) {
                 expect(feed.name).toBeDefined();
-                expect(feed.url.length).not.toBe(0);
+                expect(feed.name.length).not.toBe(0);
             }
         });
     });
 
 
-    /* TODO: Write a new test suite named "The menu" */
+    /* Test suite named "The menu" */
     describe("The menu", function() {
-        /* TODO: Write a test that ensures the menu element is
+        /* Test that ensures the menu element is
          * hidden by default. You'll have to analyze the HTML and
          * the CSS to determine how we're performing the
          * hiding/showing of the menu element.
@@ -65,7 +65,7 @@ $(function() {
 
         });
 
-        /* TODO: Write a test that ensures the menu changes
+        /* Test that ensures the menu changes
          * visibility when the menu icon is clicked. This test
          * should have two expectations: does the menu display when
          * clicked and does it hide when clicked again.
@@ -83,26 +83,49 @@ $(function() {
     });
 
 
-    /* TODO: Write a new test suite named "Initial Entries" */
-    describe('New Feed Selection', function() {
-        const feed = document.querySelector('.feed');
-        const firstFeed = [];
-        /* TODO: Write a test that ensures when a new feed is loaded
-         * by the loadFeed function that the content actually changes.
-         * Remember, loadFeed() is asynchronous.
-         */
+    /* Test suite named "Initial Entries" */
+    /* Test that ensures when the loadFeed
+     * function is called and completes its work, there is at least
+     * a single .entry element within the .feed container.
+     * Remember, loadFeed() is asynchronous so this test will require
+     * the use of Jasmine's beforeEach and asynchronous done() function.
+     */
+    describe('Initial Entries', function() {
         beforeEach(function(done) {
-            loadFeed(0);
-            Array.from(feed.children).forEach(function(entry) {
-                firstFeed.push(entry.innerText);
-            });
-            loadFeed(1, done);
+            loadFeed(0, function() {
+                // Get content of feed container
+                feedLoad = document.querySelector('.feed');
+                done();
+            })
+        })
+        it("It's not empty", function() {
+            expect(feedLoad.childElementCount > 0).toBe(true);
         });
+    });
+    /* Test suite named "New Feed Selection" */
 
-        it('content changes', function() {
-            Array.from(feed.children).forEach(function(entry, index) {
-                expect(entry.innerText === firstFeed[index]).toBe(false);
-            });
+    /* Test ensures that when a new feed is loaded
+     * by the loadFeed function that the content actually changes.
+     * Remember, loadFeed() is asynchronous.
+     */
+    describe('New Feed Selection', function() {
+        let feedAfterFirstLoad;
+        let feedAfterSecondLoad;
+
+        beforeEach(function(done) {
+            loadFeed(0, function() {
+                // Get content of feed container
+                feedAfterFirstLoad = document.querySelector('.feed');
+                done();
+            })
+        })
+
+        it("Content changes", function() {
+            loadFeed(1, function() {
+                feedAfterSecondLoad = document.querySelector('.feed');
+                done();
+            })
+            expect(feedAfterFirstLoad).not.toEqual(feedAfterSecondLoad);
         });
     });
 }());
